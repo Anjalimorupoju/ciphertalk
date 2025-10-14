@@ -1,0 +1,799 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --primary-color: #667eea;
+    --primary-dark: #5a6fd8;
+    --secondary-color: #764ba2;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --background-color: #f8fafc;
+    --surface-color: #ffffff;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --text-muted: #9ca3af;
+    --border-color: #e5e7eb;
+    --border-light: #f3f4f6;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    --gradient-surface: linear-gradient(135deg, var(--surface-color) 0%, #f9fafb 100%);
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+}
+
+.profile-edit-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.profile-edit-header {
+    background: var(--gradient-surface);
+    border-radius: var(--radius-xl);
+    padding: 2.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-edit-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+}
+
+.profile-edit-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.profile-edit-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.profile-edit-card {
+    background: var(--surface-color);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.profile-edit-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.profile-edit-card:hover::before {
+    transform: scaleX(1);
+}
+
+.profile-edit-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.profile-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.profile-section-title i {
+    color: var(--primary-color);
+    font-size: 1.3em;
+}
+
+/* Form Styles */
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-label i {
+    color: var(--primary-color);
+    font-size: 0.9em;
+}
+
+.form-control {
+    padding: 0.875rem 1.125rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--surface-color);
+    color: var(--text-primary);
+    font-weight: 500;
+    box-shadow: var(--shadow-sm);
+    width: 100%;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+/* Avatar Upload */
+.avatar-upload {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+}
+
+.avatar-upload-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.avatar-upload-btn {
+    background: var(--surface-color);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-secondary);
+    position: relative;
+}
+
+.avatar-upload-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.avatar-upload-btn i {
+    margin-right: 0.5rem;
+}
+
+/* Hide the actual file input but make it clickable */
+.avatar-upload-controls input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Checkbox Styles */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.checkbox-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background: var(--surface-color);
+}
+
+.checkbox-custom i {
+    color: white;
+    font-size: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.checkbox-input:checked + .checkbox-label .checkbox-custom {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-input:checked + .checkbox-label .checkbox-custom i {
+    opacity: 1;
+}
+
+.checkbox-input {
+    display: none;
+}
+
+/* Button Styles */
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: var(--shadow-sm);
+    flex: 1;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+    background: var(--background-color);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.btn i {
+    font-size: 0.9em;
+}
+
+/* Error Messages */
+.form-error-text {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(239, 68, 68, 0.05);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--error-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-error-text::before {
+    content: '⚠';
+    font-size: 0.75em;
+}
+
+/* Success Messages */
+.messages {
+    margin-bottom: 2rem;
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: var(--error-color);
+    color: var(--error-color);
+}
+
+/* Enhanced Background */
+body {
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.05) 0%, transparent 50%),
+        linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    min-height: 100vh;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-edit-container {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .profile-edit-header {
+        padding: 2rem 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-edit-card {
+        padding: 1.5rem;
+    }
+    
+    .profile-edit-title {
+        font-size: 1.5rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .avatar-upload {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-edit-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .profile-edit-card {
+        padding: 1rem;
+    }
+    
+    .profile-section-title {
+        font-size: 1.25rem;
+    }
+}
+
+/* Loading State */
+.btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Focus States for Accessibility */
+.btn:focus,
+.form-control:focus,
+.checkbox-input:focus + .checkbox-label .checkbox-custom {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-edit-container">
+    <div class="profile-edit-header">
+        <h1 class="profile-edit-title">Edit Profile</h1>
+        <p class="profile-edit-subtitle">Update your personal information and preferences</p>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="profile-form" id="profileForm">
+        {% csrf_token %}
+        
+        <!-- Personal Information Section -->
+        <div class="profile-edit-card">
+            <h2 class="profile-section-title">
+                <i class="fas fa-user-circle"></i>
+                Personal Information
+            </h2>
+            
+            <!-- Avatar Upload -->
+            <div class="avatar-upload">
+                <img src="{% if user.profile.avatar %}{{ user.profile.avatar.url }}{% else %}{% static 'img/default-avatar.png' %}{% endif %}" 
+                     alt="Current Avatar" class="avatar-preview" id="avatarPreview">
+                <div class="avatar-upload-controls">
+                    <div class="avatar-upload-btn">
+                        <i class="fas fa-camera"></i>
+                        Change Avatar
+                        {{ profile_form.avatar }}
+                    </div>
+                    <small style="color: var(--text-muted); font-size: 0.875rem;">
+                        Recommended: Square image, 200x200 pixels or larger
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <!-- First Name -->
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">
+                        <i class="fas fa-user"></i>
+                        First Name
+                    </label>
+                    {{ user_form.first_name }}
+                    {% if user_form.first_name.errors %}
+                    <div class="form-error-text">
+                        {% for error in user_form.first_name.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Last Name -->
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">
+                        <i class="fas fa-user"></i>
+                        Last Name
+                    </label>
+                    {{ user_form.last_name }}
+                    {% if user_form.last_name.errors %}
+                    <div class="form-error-text">
+                        {% for error in user_form.last_name.errors %}
+                        <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label class="form-label" for="id_phone_number">
+                    <i class="fas fa-phone"></i>
+                    Phone Number
+                </label>
+                {{ user_form.phone_number }}
+                {% if user_form.phone_number.errors %}
+                <div class="form-error-text">
+                    {% for error in user_form.phone_number.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Profile Information Section -->
+        <div class="profile-edit-card">
+            <h2 class="profile-section-title">
+                <i class="fas fa-id-card"></i>
+                Profile Information
+            </h2>
+
+            <!-- Date of Birth -->
+            <div class="form-group">
+                <label class="form-label" for="id_date_of_birth">
+                    <i class="fas fa-birthday-cake"></i>
+                    Date of Birth
+                </label>
+                {{ profile_form.date_of_birth }}
+                {% if profile_form.date_of_birth.errors %}
+                <div class="form-error-text">
+                    {% for error in profile_form.date_of_birth.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Location -->
+            <div class="form-group">
+                <label class="form-label" for="id_location">
+                    <i class="fas fa-location-dot"></i>
+                    Location
+                </label>
+                {{ profile_form.location }}
+                {% if profile_form.location.errors %}
+                <div class="form-error-text">
+                    {% for error in profile_form.location.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Website -->
+            <div class="form-group">
+                <label class="form-label" for="id_website">
+                    <i class="fas fa-globe"></i>
+                    Website
+                </label>
+                {{ profile_form.website }}
+                {% if profile_form.website.errors %}
+                <div class="form-error-text">
+                    {% for error in profile_form.website.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Bio -->
+            <div class="form-group">
+                <label class="form-label" for="id_bio">
+                    <i class="fas fa-file-text"></i>
+                    Bio
+                </label>
+                {{ profile_form.bio }}
+                {% if profile_form.bio.errors %}
+                <div class="form-error-text">
+                    {% for error in profile_form.bio.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <small style="color: var(--text-muted); font-size: 0.875rem;">
+                    Tell us a bit about yourself (max 500 characters)
+                </small>
+            </div>
+        </div>
+
+        <!-- Privacy Settings Section -->
+        <div class="profile-edit-card">
+            <h2 class="profile-section-title">
+                <i class="fas fa-shield-alt"></i>
+                Privacy Settings
+            </h2>
+
+            <!-- Show Online Status -->
+            <div class="checkbox-group">
+                {{ profile_form.show_online_status }}
+                <label for="{{ profile_form.show_online_status.id_for_label }}" class="checkbox-label">
+                    <span class="checkbox-custom">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    Show online status to other users
+                </label>
+            </div>
+
+            <!-- Allow Friend Requests -->
+            <div class="checkbox-group">
+                {{ profile_form.allow_friend_requests }}
+                <label for="{{ profile_form.allow_friend_requests.id_for_label }}" class="checkbox-label">
+                    <span class="checkbox-custom">
+                        <i class="fas fa-check"></i>
+                    </span>
+                    Allow friend requests from other users
+                </label>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{% url 'users:profile' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-save"></i>
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profileForm = document.getElementById('profileForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const avatarInput = document.querySelector('input[name="avatar"]');
+    const avatarPreview = document.getElementById('avatarPreview');
+
+    // Avatar preview
+    if (avatarInput && avatarPreview) {
+        avatarInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Loading state
+    profileForm.addEventListener('submit', function() {
+        submitBtn.classList.add('loading');
+        submitBtn.innerHTML = '<i class="fas fa-spinner"></i> Saving...';
+    });
+
+    // Character counter for bio
+    const bioField = document.getElementById('id_bio');
+    if (bioField) {
+        const charCount = document.createElement('div');
+        charCount.style.color = 'var(--text-muted)';
+        charCount.style.fontSize = '0.875rem';
+        charCount.style.marginTop = '0.5rem';
+        bioField.parentNode.appendChild(charCount);
+
+        function updateCharCount() {
+            const length = bioField.value.length;
+            charCount.textContent = `${length}/500 characters`;
+            if (length > 500) {
+                charCount.style.color = 'var(--error-color)';
+            } else {
+                charCount.style.color = 'var(--text-muted)';
+            }
+        }
+
+        bioField.addEventListener('input', updateCharCount);
+        updateCharCount(); // Initial count
+    }
+
+    // Style the checkboxes to work with custom styling
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        // Wrap each checkbox with our custom structure
+        const wrapper = document.createElement('div');
+        wrapper.className = 'checkbox-group';
+        
+        const customCheckbox = document.createElement('span');
+        customCheckbox.className = 'checkbox-custom';
+        customCheckbox.innerHTML = '<i class="fas fa-check"></i>';
+        
+        const label = checkbox.nextElementSibling;
+        const newLabel = document.createElement('label');
+        newLabel.htmlFor = checkbox.id;
+        newLabel.className = 'checkbox-label';
+        newLabel.appendChild(customCheckbox);
+        if (label) {
+            newLabel.appendChild(document.createTextNode(label.textContent));
+            label.remove();
+        }
+        
+        wrapper.appendChild(checkbox);
+        wrapper.appendChild(newLabel);
+        
+        checkbox.parentNode.insertBefore(wrapper, checkbox);
+        checkbox.parentNode.removeChild(checkbox.nextSibling); // Remove original label if any
+    });
+});
+</script>
+{% endblock %}
